@@ -15,6 +15,8 @@ from src.data_utils import (
     update_dataset,
 )
 
+CAL_DATA_VEGAS_WP = "Vegas WP Calibration Data"
+
 
 def pbp_dataset(args):
     args = SimpleNamespace(**args)
@@ -93,7 +95,7 @@ def _save_calibration_data(calibration_data, cal_prefix):
 
 def _calibrate_data(args, dataset):
 
-    cal_data = get_dataset(args.calibrate, args.project, _generate_calibration_tags(args))
+    cal_data = get_dataset(CAL_DATA_VEGAS_WP, args.project, _generate_calibration_tags(args))
 
     seasons_to_calibrate = _get_seasons_if_needed(cal_data, args)
 
