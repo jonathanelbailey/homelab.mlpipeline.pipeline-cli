@@ -33,13 +33,15 @@ class TestPipelineCli(unittest.TestCase):
             main()
 
         mock_pbp_dataset.assert_called_once_with(
-            start_year=int(start_year),
-            end_year=int(end_year),
-            dataset=dataset_name,
-            update=True,
-            project=project_name,
-            calibrate=True,
-            vegas=True,
+            {
+                "start_year": int(start_year),
+                "end_year": int(end_year),
+                "dataset": dataset_name,
+                "update": True,
+                "project": project_name,
+                "calibrate": True,
+                "vegas": True,
+            }
         )
 
 
