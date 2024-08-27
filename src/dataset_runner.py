@@ -1,5 +1,5 @@
 import os
-
+from types import SimpleNamespace
 from src.calibration import generate_vegas_wp_calibration_data
 from src.data_utils import (
     clean_nfl_data,
@@ -17,6 +17,7 @@ from src.data_utils import (
 
 
 def pbp_dataset(args):
+    args = SimpleNamespace(**args)
 
     if args.update:
         remote_dataset = get_dataset(args.dataset, args.project, generate_tags(args))

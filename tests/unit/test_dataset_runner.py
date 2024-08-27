@@ -13,17 +13,15 @@ class DatasetRunner(unittest.TestCase):
         self.seasons = [2018, 2019, 2020]
         self.test_data = pd.DataFrame({"column1": [1, 2, 3], "column2": ["a", "b", "c"], "season": self.seasons})
         self.grouped_test_data = self.test_data.groupby("season")
-        self.args = SimpleNamespace(
-            **{
-                "start_year": 2018,
-                "end_year": 2020,
-                "dataset": "NFL Play-by-Play Data",
-                "project": "NFL WP Model",
-                "update": True,
-                "calibrate": True,
-                "vegas": True,
-            }
-        )
+        self.args = {
+            "start_year": 2018,
+            "end_year": 2020,
+            "dataset": "NFL Play-by-Play Data",
+            "project": "NFL WP Model",
+            "update": True,
+            "calibrate": True,
+            "vegas": True,
+        }
 
     @patch("src.dataset_runner._calibrate_data")
     @patch("src.dataset_runner.update_dataset")
