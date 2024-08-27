@@ -6,7 +6,7 @@ dev_requirements = ["pre-commit", "black", "flake8", "isort", "pytest"]
 
 setup(
     name="pipeline-cli",
-    version="0.6.0",
+    version="0.7.0",
     author="Jonathan Bailey",
     author_email="jonathan@jelbailey.com",
     description="A CLI tool for managing ClearML Pipelines",
