@@ -172,7 +172,7 @@ class TestDataUtils(unittest.TestCase):
 
     def test_generate_files_diff(self):
         dataset = MagicMock()
-        dataset.get_files.return_value = ["file1", "file2", "file3"]
+        dataset.list_files.return_value = ["file1", "file2", "file3"]
         seasons = [2018, 2019, 2020]
         expected = 0
         actual = generate_files_diff(dataset, seasons)
