@@ -32,7 +32,7 @@ def main():
     subcommand = kwargs.pop("backend")
     del kwargs["/subparser1"]
 
-    subcommand(**kwargs)
+    subcommand(kwargs)
 
 
 def _add_dataset_subparser(subparsers):
