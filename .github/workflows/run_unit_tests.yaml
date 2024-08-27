@@ -30,7 +30,4 @@ jobs:
         run: python -m unittest discover -s tests/unit -p 'test_*.py'
 
       - name: Run Black
-        run: python -m black --check .
-
-      - name: Run Isort
-        run: python -m isort --check .
+        run: python -m black --check . --diff

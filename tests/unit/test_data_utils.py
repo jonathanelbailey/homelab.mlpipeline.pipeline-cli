@@ -5,9 +5,21 @@ from unittest.mock import MagicMock, call, patch
 
 import pandas as pd
 
-from src.data_utils import (clean_nfl_data, generate_files_diff, generate_required_seasons, generate_seasons, generate_tags, get_dataset,
-                            get_seasons_to_import, load_pbp_data, process_dataframe, read_csvs_in_parallel, read_from_csv, save_to_csv,
-                            update_dataset)
+from src.data_utils import (
+    clean_nfl_data,
+    generate_files_diff,
+    generate_required_seasons,
+    generate_seasons,
+    generate_tags,
+    get_dataset,
+    get_seasons_to_import,
+    load_pbp_data,
+    process_dataframe,
+    read_csvs_in_parallel,
+    read_from_csv,
+    save_to_csv,
+    update_dataset,
+)
 
 
 class TestDataUtils(unittest.TestCase):
