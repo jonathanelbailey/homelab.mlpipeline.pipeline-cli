@@ -90,7 +90,7 @@ def generate_seasons(args):
 
 
 def generate_files_diff(dataset, seasons):
-    return len(dataset.get_files()) - len(seasons)
+    return len(dataset.list_files()) - len(seasons)
 
 
 def generate_required_seasons(diff, seasons):
