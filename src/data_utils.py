@@ -45,10 +45,13 @@ def read_csvs_in_parallel(file_list):
 
 def is_current(dataset, tags):
     files = dataset.list_files()
-    dataset_start = files[0].split(".", 1)[0].split("_")[-1]
-    dataset_end = files[-1].split(".", 1)[0].split("_")[-1]
-    dataset_years = f"{dataset_start}-{dataset_end}"
-    dataset_state = tags[1]
+    if not files:
+        return False
+    else:
+        dataset_start = files[0].split(".", 1)[0].split("_")[-1]
+        dataset_end = files[-1].split(".", 1)[0].split("_")[-1]
+        dataset_years = f"{dataset_start}-{dataset_end}"
+        dataset_state = tags[1]
     if dataset_state == "COMPLETE" and dataset_years == tags[0]:
         return True
     return False
