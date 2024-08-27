@@ -128,7 +128,7 @@ class TestDataUtils(unittest.TestCase):
                         "dataset_project": "dummy_project",
                         "auto_create": True,
                         "writable_copy": True,
-                        "tags": ["2018-2020"],
+                        "dataset_tags": ["2018-2020"],
                     },
                 ],
                 ["2018-2020"],  # tags needed

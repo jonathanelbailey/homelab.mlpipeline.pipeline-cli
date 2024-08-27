@@ -60,7 +60,7 @@ def get_dataset(dataset_name, dataset_project, tags=None):
 
     except ValueError:
         print(f"Dataset {dataset_name} not found in project {dataset_project}, creating new dataset.")
-        dataset = Dataset.get(dataset_name=dataset_name, dataset_project=dataset_project, auto_create=True, writable_copy=True, tags=tags)
+        dataset = Dataset.get(dataset_name=dataset_name, dataset_project=dataset_project, auto_create=True, writable_copy=True, dataset_tags=tags)
 
     return dataset
 
