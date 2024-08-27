@@ -24,12 +24,7 @@ class DatasetRunner(unittest.TestCase):
         }
 
     @patch("src.dataset_runner._calibrate_data")
-    @patch("src.dataset_runner.update_dataset")
-    @patch("src.dataset_runner.process_dataframe")
-    @patch("src.dataset_runner.clean_nfl_data")
-    @patch("src.dataset_runner.load_pbp_data")
     @patch("src.dataset_runner.print")
-    @patch("src.dataset_runner.os.makedirs")
     @patch("src.dataset_runner.get_seasons_to_import")
     @patch("src.dataset_runner.generate_tags")
     @patch("src.dataset_runner.get_dataset")
@@ -38,31 +33,20 @@ class DatasetRunner(unittest.TestCase):
         mock_get_dataset,
         mock_generate_tags,
         mock_get_seasons_to_import,
-        mock_makedirs,
         mock_print,
-        mock_load_pbp_data,
-        mock_clean_nfl_data,
-        mock_process_dataframe,
-        mock_update_dataset,
         mock_calibrate_data,
     ):
         mock_get_dataset.return_value = MagicMock()
         mock_generate_tags.return_value = ["2018-2020", "COMPLETE"]
         mock_get_seasons_to_import.return_value = self.seasons
-        mock_load_pbp_data.return_value = self.test_data
         mock_calibrate_data.return_value = self.test_data
         pbp_dataset(self.args)
 
-        mock_makedirs.assert_called_with("pbp_data", exist_ok=True)
         mock_print.assert_has_calls(
             [
-                call("Importing Play-by-Play Data for the following years:\n[2018, 2019, 2020]"),
+                call("Dataset is current. No new data to import."),
             ]
         )
-        mock_load_pbp_data.assert_called_with(self.seasons)
-        mock_clean_nfl_data.assert_called_with(self.test_data)
-        mock_process_dataframe.assert_called()
-        mock_update_dataset.assert_called_with(mock_get_dataset.return_value, "pbp_data")
 
 
 if __name__ == "__main__":

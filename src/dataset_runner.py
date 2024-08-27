@@ -3,8 +3,6 @@ from types import SimpleNamespace
 from src.calibration import generate_vegas_wp_calibration_data
 from src.data_utils import (
     clean_nfl_data,
-    generate_files_diff,
-    generate_required_seasons,
     generate_tags,
     get_dataset,
     get_seasons_to_import,
@@ -13,6 +11,7 @@ from src.data_utils import (
     process_dataframe,
     read_csvs_in_parallel,
     update_dataset,
+    generate_seasons,
 )
 
 CAL_DATA_VEGAS_WP = "Vegas WP Calibration Data"
@@ -22,24 +21,21 @@ def pbp_dataset(args):
     args = SimpleNamespace(**args)
 
     if args.update:
-        remote_dataset = get_dataset(args.dataset, args.project, generate_tags(args))
-
-        seasons_to_be_imported = _get_seasons_if_needed(remote_dataset, args)
-
-        if not seasons_to_be_imported:
+        remote_dataset = get_dataset(args.dataset, args.project, writable_copy=True, tags=generate_tags(args))
+        if remote_dataset.is_final():
             print(f"Dataset is current. No new data to import.")
             return
 
-        print(f"Importing Play-by-Play Data for the following years:\n{seasons_to_be_imported}")
-        pbp_data = _process_pbp_data(seasons_to_be_imported)
+        print(f"Importing Play-by-Play Data for the following years:\n{generate_seasons(args)}")
+        pbp_data = _process_pbp_data(generate_seasons(args))
 
         pbp_dataset_file_prefix = "pbp_data"
         _save_pbp_data(pbp_data, pbp_dataset_file_prefix)
 
         update_dataset(remote_dataset, pbp_dataset_file_prefix)
 
-        if args.calibrate and args.vegas:
-            _calibrate_data(args, remote_dataset)
+    if args.calibrate and args.vegas:
+        _calibrate_data(args)
 
 
 def _create_directory(directory):
@@ -53,7 +49,7 @@ def _get_seasons_if_needed(dataset, args):
 
         return []
 
-    return get_seasons_to_import(args)
+    return get_seasons_to_import(dataset, args)
 
 
 def _process_pbp_data(seasons):
@@ -74,14 +70,16 @@ def _save_pbp_data(pbp_data, file_prefix):
 
 def _generate_calibration_tags(args):
 
-    return ["CALIBRATION DATA", f"{args.dataset}"] + generate_tags(args)
+    return ["CALIBRATION DATA"] + generate_tags(args)
 
 
-def _process_calibration_data(dataset, seasons):
+def _process_calibration_data(pbp_dataset):
 
-    file_list = dataset.get_files()
+    dataset_files = pbp_dataset.list_files()
+    dataset_files_path = pbp_dataset.get_local_copy()
+    dataset_files_list = [os.path.join(dataset_files_path, file) for file in dataset_files]
 
-    pbp_data = read_csvs_in_parallel(generate_required_seasons(generate_files_diff(file_list, seasons), file_list))
+    pbp_data = read_csvs_in_parallel(dataset_files_list)
 
     return generate_vegas_wp_calibration_data(pbp_data)
 
@@ -93,17 +91,18 @@ def _save_calibration_data(calibration_data, cal_prefix):
     process_dataframe(calibration_data, cal_prefix)
 
 
-def _calibrate_data(args, dataset):
+def _calibrate_data(args):
+    pbp_data = get_dataset(args.dataset, args.project, writable_copy=False, tags=generate_tags(args))
 
-    cal_data = get_dataset(CAL_DATA_VEGAS_WP, args.project, _generate_calibration_tags(args))
+    cal_data = get_dataset(CAL_DATA_VEGAS_WP, args.project, tags=_generate_calibration_tags(args))
 
-    seasons_to_calibrate = _get_seasons_if_needed(cal_data, args)
-
-    if not seasons_to_calibrate:
+    if cal_data.is_final():
         print("Calibration data is current. No new data to import")
         return
 
-    print(f"Importing Calibration Data for the following years:\n{seasons_to_calibrate}")
-    calibration_data = _process_calibration_data(dataset, seasons_to_calibrate)
+    cal_data_prefix = "cal_data"
+    calibration_data = _process_calibration_data(pbp_data)
 
-    _save_calibration_data(calibration_data, args.cal_prefix)
+    _save_calibration_data(calibration_data, cal_data_prefix)
+
+    update_dataset(cal_data, cal_data_prefix)
