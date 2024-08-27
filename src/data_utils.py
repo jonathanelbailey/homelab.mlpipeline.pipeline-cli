@@ -57,15 +57,13 @@ def is_current(dataset, tags):
     return False
 
 
-def get_dataset(dataset_name, dataset_project, tags=None):
+def get_dataset(dataset_name, dataset_project, writable_copy=True, tags=None):
     try:
-        dataset = Dataset.get(dataset_name=dataset_name, dataset_project=dataset_project, writable_copy=True)
+        dataset = Dataset.get(dataset_name=dataset_name, dataset_project=dataset_project, writable_copy=writable_copy, dataset_tags=tags)
 
     except ValueError:
         print(f"Dataset {dataset_name} not found in project {dataset_project}, creating new dataset.")
-        dataset = Dataset.get(
-            dataset_name=dataset_name, dataset_project=dataset_project, auto_create=True, writable_copy=True, dataset_tags=tags
-        )
+        dataset = Dataset.get(dataset_name=dataset_name, dataset_project=dataset_project, auto_create=True, dataset_tags=tags)
 
     return dataset
 
@@ -97,15 +95,15 @@ def generate_required_seasons(diff, seasons):
     return seasons[-diff:]
 
 
-def get_seasons_to_import(args):
+def get_seasons_to_import(dataset, args):
     seasons = generate_seasons(args)
-    diff = generate_files_diff(args.dataset, seasons)
+    diff = generate_files_diff(dataset, seasons)
 
     return generate_required_seasons(diff, seasons)
 
 
 def get_current_season_year():
     now = datetime.datetime.now()
-    if 2 > now.month < 9:
+    if 9 > now.month > 2:
         return (now.year - 1, "COMPLETE")
     return (now.year, "IN PROGRESS")

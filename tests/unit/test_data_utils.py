@@ -94,13 +94,13 @@ class TestDataUtils(unittest.TestCase):
         mock_concat.assert_called_with([self.test_data, self.test_data, self.test_data], ignore_index=True)
         assert isinstance(actual, pd.DataFrame)
 
-    def run_test_get_dataset(self, MockDataset, mock_print, side_effect, expected_calls, tags, expected):
+    def run_test_get_dataset(self, MockDataset, mock_print, side_effect, expected_calls, writable_copy, tags, expected):
         MockDataset.get.side_effect = side_effect
         dataset_name = expected_calls[0]["dataset_name"]
         dataset_project = expected_calls[0]["dataset_project"]
         print_msg = f"Dataset {dataset_name} not found in project {dataset_project}, creating new dataset."
 
-        actual = get_dataset(dataset_name, dataset_project, tags)
+        actual = get_dataset(dataset_name, dataset_project, writable_copy, tags)
         if side_effect[0] == ValueError:
             mock_print.assert_called_once_with(print_msg)
         MockDataset.get.assert_has_calls([call(**expected_call) for expected_call in expected_calls])
@@ -114,7 +114,8 @@ class TestDataUtils(unittest.TestCase):
             # Test Case 1: Dataset Exists
             (
                 [MagicMock()],  # side_effect when no ValueError is raised
-                [{"dataset_name": "dummy_dataset", "dataset_project": "dummy_project", "writable_copy": True}],
+                [{"dataset_name": "dummy_dataset", "dataset_project": "dummy_project", "writable_copy": True, "dataset_tags": None}],
+                True,
                 None,  # No tags needed
                 MagicMock,  # Expected result
             ),
@@ -122,23 +123,31 @@ class TestDataUtils(unittest.TestCase):
             (
                 [ValueError(), MagicMock()],  # side_effect when ValueError is raised
                 [
-                    {"dataset_name": "dummy_dataset", "dataset_project": "dummy_project", "writable_copy": True},
+                    {"dataset_name": "dummy_dataset", "dataset_project": "dummy_project", "writable_copy": True, "dataset_tags": None},
+                    {
+                        "dataset_name": "dummy_dataset",
+                        "dataset_project": "dummy_project",
+                        "writable_copy": False,
+                        "dataset_tags": ["2018-2020"],
+                    },
                     {
                         "dataset_name": "dummy_dataset",
                         "dataset_project": "dummy_project",
                         "auto_create": True,
-                        "writable_copy": True,
                         "dataset_tags": ["2018-2020"],
                     },
                 ],
+                False,
                 ["2018-2020"],  # tags needed
                 MagicMock,  # Expected result
             ),
         ]
 
-        for side_effect, expected_calls, tags, expected in test_cases:
-            with self.subTest(side_effect=side_effect, expected_calls=expected_calls, tags=tags, expected=expected):
-                self.run_test_get_dataset(MockDataset, mock_print, side_effect, expected_calls, tags, expected)
+        for side_effect, expected_calls, writable_copy, tags, expected in test_cases:
+            with self.subTest(
+                side_effect=side_effect, expected_calls=expected_calls, writable_copy=writable_copy, tags=tags, expected=expected
+            ):
+                self.run_test_get_dataset(MockDataset, mock_print, side_effect, expected_calls, writable_copy, tags, expected)
 
     @patch("src.data_utils.Dataset")
     def test_update_dataset(self, MockDataset):
@@ -189,6 +198,7 @@ class TestDataUtils(unittest.TestCase):
     @patch("src.data_utils.generate_files_diff")
     @patch("src.data_utils.generate_seasons")
     def test_get_seasons_to_import(self, mock_generate_seasons, mock_generate_files_diff, mock_generate_required_seasons):
+        dataset = MagicMock()
         args = MagicMock()
         args.start_year = 2018
         args.end_year = (2020, "COMPLETE")
@@ -197,10 +207,10 @@ class TestDataUtils(unittest.TestCase):
         expected = []
         mock_generate_required_seasons.return_value = expected
 
-        actual = get_seasons_to_import(args)
+        actual = get_seasons_to_import(dataset, args)
 
         mock_generate_seasons.assert_called_with(args)
-        mock_generate_files_diff.assert_called_with(args.dataset, mock_generate_seasons.return_value)
+        mock_generate_files_diff.assert_called_with(dataset, mock_generate_seasons.return_value)
         mock_generate_required_seasons.assert_called_with(mock_generate_files_diff.return_value, mock_generate_seasons.return_value)
 
         assert actual == expected
