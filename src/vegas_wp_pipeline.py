@@ -93,7 +93,22 @@ def train(**kwargs):
 if __name__ == "__main__":
 
     # create the pipeline controller
-    pipe = PipelineController(name=VEGAS_WP_MODEL_PIPELINE, project=VEGAS_WP_MODEL_PIPELINE_PROJECT)
+    pipe = PipelineController(
+        name=VEGAS_WP_MODEL_PIPELINE,
+        project=VEGAS_WP_MODEL_PIPELINE_PROJECT,
+        packages=[
+            "xgboost",
+            "pandas",
+            "scikit-learn",
+            "matplotlib",
+            "numpy<2.0.0",
+            "nfl-data-py",
+            "clearml",
+            "pipeline-cli @ git+https://github.com/jonathanelbailey/homelab.mlpipeline.pipeline-cli.git"
+        ],
+        repo="https://github.com/jonathanelbailey/homelab.mlpipeline.pipeline-cli.git",
+        repo_branch="feature/initial_project",
+    )
 
     # set the default execution queue to be used (per step we can override the execution)
     pipe.set_default_execution_queue("default")
