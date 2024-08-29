@@ -1,14 +1,23 @@
 from clearml import PipelineController, TaskTypes
+from src.constants import (
+    VEGAS_WP_MODEL_PIPELINE_PROJECT,
+    VEGAS_WP_MODEL_PIPELINE,
+    VEGAS_WP_CALIBRATION_DATASET,
+)
 
 
-def get_data(id: str):
+def get_data(dataset: str):
     from multiprocessing import Pool
-
+    import os
     import pandas as pd
-    from pipeline import get_dataset, read_from_csv
+    from src.data_utils import get_dataset, read_from_csv
+    from src.constants import VEGAS_WP_CALIBRATION_DATASET_PROJECT
 
     print("Getting calibration dataset...")
-    cal_data_csv_paths = get_dataset(id)
+    cal_dataset = get_dataset(dataset, VEGAS_WP_CALIBRATION_DATASET_PROJECT, writable_copy=False)
+    cal_dataset_files = cal_dataset.list_files()
+    cal_data_csv_path = cal_dataset.get_local_copy()
+    cal_data_csv_paths = [os.path.join(cal_data_csv_path, file) for file in cal_dataset_files]
     with Pool() as pool:
         dataframes = pool.map(read_from_csv, cal_data_csv_paths)
 
@@ -84,13 +93,13 @@ def train(**kwargs):
 if __name__ == "__main__":
 
     # create the pipeline controller
-    pipe = PipelineController(name="Vegas WP Model Training Pipeline", project="NFL WP Model")
+    pipe = PipelineController(name=VEGAS_WP_MODEL_PIPELINE, project=VEGAS_WP_MODEL_PIPELINE_PROJECT)
 
     # set the default execution queue to be used (per step we can override the execution)
     pipe.set_default_execution_queue("default")
 
     # add pipeline components
-    pipe.add_parameter(name="dataset_id", description="Dataset ID", default="d34f6be7f7f148ffba9f0d4e9a57feb8", param_type="str")
+    pipe.add_parameter(name="dataset", description="Dataset", default=VEGAS_WP_CALIBRATION_DATASET, param_type="str")
 
     pipe.add_parameter(name="n_estimators", description="Number of estimators", default=15000, param_type="int")
 
@@ -150,7 +159,7 @@ if __name__ == "__main__":
     pipe.add_function_step(
         name="get_data",
         function=get_data,
-        function_kwargs=dict(id="${pipeline.dataset_id}"),
+        function_kwargs=dict(dataset="${pipeline.dataset}"),
         function_return=["cal_data"],
         cache_executed_step=True,
         task_type=TaskTypes.data_processing,
@@ -209,8 +218,8 @@ if __name__ == "__main__":
 
     # For debugging purposes run on the pipeline on current machine
     # Use run_pipeline_steps_locally=True to further execute the pipeline component Tasks as subprocesses.
-    pipe.start_locally(run_pipeline_steps_locally=True)
-
+    # pipe.start_locally(run_pipeline_steps_locally=True)
+    pipe.start(queue="default")
     # Start the pipeline on the services queue (remote machine, default on the clearml-server)
     # pipe.start()
 

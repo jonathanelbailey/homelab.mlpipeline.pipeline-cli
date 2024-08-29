@@ -13,8 +13,11 @@ from src.data_utils import (
     update_dataset,
     generate_seasons,
 )
-
-CAL_DATA_VEGAS_WP = "Vegas WP Calibration Data"
+from src.constants import (
+    VEGAS_WP_CALIBRATION_DATASET_TAGS,
+    VEGAS_WP_CALIBRATION_DATASET,
+    VEGAS_WP_CALIBRATION_DATASET_PROJECT
+)
 
 
 def pbp_dataset(args):
@@ -70,7 +73,7 @@ def _save_pbp_data(pbp_data, file_prefix):
 
 def _generate_calibration_tags(args):
 
-    return ["CALIBRATION DATA"] + generate_tags(args)
+    return VEGAS_WP_CALIBRATION_DATASET_TAGS + generate_tags(args)
 
 
 def _process_calibration_data(pbp_dataset):
@@ -94,7 +97,10 @@ def _save_calibration_data(calibration_data, cal_prefix):
 def _calibrate_data(args):
     pbp_data = get_dataset(args.dataset, args.project, writable_copy=False, tags=generate_tags(args))
 
-    cal_data = get_dataset(CAL_DATA_VEGAS_WP, args.project, tags=_generate_calibration_tags(args))
+    cal_data = get_dataset(
+        VEGAS_WP_CALIBRATION_DATASET,
+        VEGAS_WP_CALIBRATION_DATASET_PROJECT,
+        tags=_generate_calibration_tags(args))
 
     if cal_data.is_final():
         print("Calibration data is current. No new data to import")
@@ -102,7 +108,7 @@ def _calibrate_data(args):
 
     cal_data_prefix = "cal_data"
     calibration_data = _process_calibration_data(pbp_data)
-
-    _save_calibration_data(calibration_data, cal_data_prefix)
-
-    update_dataset(cal_data, cal_data_prefix)
+    calibration_data.to_csv("cal_data.csv")
+    # _save_calibration_data(calibration_data, cal_data_prefix)
+    #
+    # update_dataset(cal_data, cal_data_prefix)

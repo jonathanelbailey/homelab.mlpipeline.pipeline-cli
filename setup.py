@@ -1,12 +1,12 @@
 from setuptools import find_packages, setup
 
-requirements = ["clearml", "nfl-data-py", "pandas", "numpy<2.0.0"]
+requirements = ["clearml", "nfl-data-py", "pandas", "numpy<2.0.0", "xgboost", "scikit-learn", "matplotlib"]
 
 dev_requirements = ["pre-commit", "black", "flake8", "isort", "pytest"]
 
 setup(
     name="pipeline-cli",
-    version="0.10.0",
+    version="0.11.0",
     author="Jonathan Bailey",
     author_email="jonathan@jelbailey.com",
     description="A CLI tool for managing ClearML Pipelines",

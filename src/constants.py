@@ -1,0 +1,10 @@
+META_VAR = "YYYY"
+PBP_DATASET_PROJECT = "NFL Play-by-Play Dataset"
+PBP_DATASET = "NFL Play-by-Play Data"
+PBP_DATASET_TAGS = ["NFL", "PBP"]
+VEGAS_WP_CALIBRATION_DATASET_PROJECT = "Vegas WP Calibration Dataset"
+VEGAS_WP_CALIBRATION_DATASET = "Vegas WP Calibration Data"
+VEGAS_WP_CALIBRATION_DATASET_TAGS = ["NFL", "Vegas", "WP"]
+VEGAS_WP_MODEL_PIPELINE_PROJECT = "Vegas WP Model"
+VEGAS_WP_MODEL_PIPELINE = "Vegas WP Model Training Pipeline"
+VEGAS_WP_MODEL_PIPELINE_TAGS = ["NFL", "Vegas", "WP", "Model", "Training"]

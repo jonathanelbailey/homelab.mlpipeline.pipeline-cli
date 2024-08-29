@@ -1,5 +1,5 @@
 from typing import Any, Callable, Optional
-
+from  concurrent.futures import ThreadPoolExecutor
 import numpy as np
 import pandas as pd
 import xgboost as xgb
@@ -10,7 +10,7 @@ class Preprocess(object):
     def __init__(self):
         # set internal state, this will be called only once. (i.e. not per request)
         self._model = xgb.XGBClassifier()
-        pass
+        self.executor = ThreadPoolExecutor(max_workers=32)
 
     def load(self, local_file_name: str) -> Optional[Any]:  # noqa
         """

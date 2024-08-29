@@ -2,8 +2,12 @@ import argparse
 from textwrap import dedent
 from src.data_utils import get_current_season_year
 from src.dataset_runner import pbp_dataset
+from src.constants import (
+    META_VAR,
+    PBP_DATASET_PROJECT,
+    PBP_DATASET,
 
-META_VAR = "YYYY"
+)
 
 
 def main():
@@ -25,7 +29,7 @@ def main():
 
     subparsers = parser.add_subparsers(help="subcommand help", required=True)
 
-    _add_dataset_subparser(subparsers)
+    _add_datasets_subparser(subparsers)
 
     kwargs = vars(parser.parse_args())
 
@@ -35,7 +39,7 @@ def main():
     subcommand(kwargs)
 
 
-def _add_dataset_subparser(subparsers):
+def _add_datasets_subparser(subparsers):
 
     subparser = subparsers.add_parser("datasets", description="Import data to a ClearML Dataset")
 
@@ -59,8 +63,8 @@ def _add_dataset_subparser(subparsers):
         type=str,
         metavar="DATASET_NAME",
         required=False,
-        default="NFL Play-by-Play Data",
-        help="Dataset Name.  Default: NFL Play-by-Play Data",
+        default=PBP_DATASET,
+        help=f"Dataset Name.  Default: {PBP_DATASET}",
     )
 
     subparser.add_argument("-u", "--update", action="store_true", help="Update the dataset with the latest data")
@@ -71,8 +75,8 @@ def _add_dataset_subparser(subparsers):
         type=str,
         metavar="PROJECT_NAME",
         required=False,
-        default="NFL Models",
-        help="Project Name.  Default: NFL Models",
+        default=PBP_DATASET_PROJECT,
+        help=f"Project Name.  Default: {PBP_DATASET_PROJECT}",
     )
 
     subparser.add_argument("-c", "--calibrate", action="store_true", help="Generate calibration data")
